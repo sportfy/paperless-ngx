@@ -33,6 +33,7 @@ import {
   map,
   debounceTime,
   distinctUntilChanged,
+  filter,
 } from 'rxjs/operators'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import {
@@ -257,6 +258,13 @@ export class DocumentDetailComponent
 
     this.route.paramMap
       .pipe(
+        filter((paramMap) => {
+          // only init when changing docs & section is set
+          return (
+            +paramMap.get('id') !== this.documentId &&
+            paramMap.get('section')?.length > 0
+          )
+        }),
         takeUntil(this.unsubscribeNotifier),
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
@@ -289,7 +297,20 @@ export class DocumentDetailComponent
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
+
           if (openDocument) {
+            if (
+              new Date(doc.modified) > new Date(openDocument.modified) &&
+              !this.modalService.hasOpenModals()
+            ) {
+              let modal = this.modalService.open(ConfirmDialogComponent)
+              modal.componentInstance.title = $localize`Document changes detected`
+              modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
+              modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
+              modal.componentInstance.cancelBtnClass = 'visually-hidden'
+              modal.componentInstance.btnCaption = $localize`Ok`
+            }
+
             if (this.documentForm.dirty) {
               Object.assign(openDocument, this.documentForm.value)
               openDocument['owner'] =
@@ -409,11 +430,14 @@ export class DocumentDetailComponent
   updateComponent(doc: Document) {
     this.document = doc
     this.requiresPassword = false
-    // this.customFields = doc.custom_fields.concat([])
     this.updateFormForCustomFields()
     this.documentsService
       .getMetadata(doc.id)
-      .pipe(first())
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
       .subscribe({
         next: (result) => {
           this.metadata = result
@@ -434,7 +458,11 @@ export class DocumentDetailComponent
     ) {
       this.documentsService
         .getSuggestions(doc.id)
-        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .pipe(
+          first(),
+          takeUntil(this.unsubscribeNotifier),
+          takeUntil(this.docChangeNotifier)
+        )
         .subscribe({
           next: (result) => {
             this.suggestions = result

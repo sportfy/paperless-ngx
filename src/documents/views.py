@@ -115,7 +115,7 @@ from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
-from documents.serialisers import BulkEditObjectPermissionsSerializer
+from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
@@ -175,16 +175,16 @@ class IndexView(TemplateView):
         context["full_name"] = self.request.user.get_full_name()
         context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
         context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
-        context[
-            "polyfills_js"
-        ] = f"frontend/{self.get_frontend_language()}/polyfills.js"
+        context["polyfills_js"] = (
+            f"frontend/{self.get_frontend_language()}/polyfills.js"
+        )
         context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
-        context[
-            "webmanifest"
-        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"
-        context[
-            "apple_touch_icon"
-        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"
+        context["webmanifest"] = (
+            f"frontend/{self.get_frontend_language()}/manifest.webmanifest"
+        )
+        context["apple_touch_icon"] = (
+            f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"
+        )
         return context
 
 
@@ -722,9 +722,9 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content),
-            "note_highlights": instance.highlights("notes", text=notes)
-            if doc
-            else None,
+            "note_highlights": (
+                instance.highlights("notes", text=notes) if doc else None
+            ),
             "rank": instance.rank,
         }
 
@@ -1401,9 +1401,9 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
     return response
 
 
-class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
+class BulkEditObjectsView(GenericAPIView, PassUserMixin):
     permission_classes = (IsAuthenticated,)
-    serializer_class = BulkEditObjectPermissionsSerializer
+    serializer_class = BulkEditObjectsSerializer
     parser_classes = (parsers.JSONParser,)
 
     def post(self, request, *args, **kwargs):
@@ -1414,42 +1414,52 @@ class BulkEditObjectPermissionsView(GenericAPIView, PassUserMixin):
         object_type = serializer.validated_data.get("object_type")
         object_ids = serializer.validated_data.get("objects")
         object_class = serializer.get_object_class(object_type)
-        permissions = serializer.validated_data.get("permissions")
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge")
+        operation = serializer.validated_data.get("operation")
+
+        objs = object_class.objects.filter(pk__in=object_ids)
 
         if not user.is_superuser:
-            objs = object_class.objects.filter(pk__in=object_ids)
             has_perms = all((obj.owner == user or obj.owner is None) for obj in objs)
 
             if not has_perms:
                 return HttpResponseForbidden("Insufficient permissions")
 
-        try:
-            qs = object_class.objects.filter(id__in=object_ids)
+        if operation == "set_permissions":
+            permissions = serializer.validated_data.get("permissions")
+            owner = serializer.validated_data.get("owner")
+            merge = serializer.validated_data.get("merge")
 
-            # if merge is true, we dont want to remove the owner
-            if "owner" in serializer.validated_data and (
-                not merge or (merge and owner is not None)
-            ):
-                # if merge is true, we dont want to overwrite the owner
-                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
-                qs_owner_update.update(owner=owner)
+            try:
+                qs = object_class.objects.filter(id__in=object_ids)
 
-            if "permissions" in serializer.validated_data:
-                for obj in qs:
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=obj,
-                        merge=merge,
-                    )
+                # if merge is true, we dont want to remove the owner
+                if "owner" in serializer.validated_data and (
+                    not merge or (merge and owner is not None)
+                ):
+                    # if merge is true, we dont want to overwrite the owner
+                    qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
+                    qs_owner_update.update(owner=owner)
 
-            return Response({"result": "OK"})
-        except Exception as e:
-            logger.warning(f"An error occurred performing bulk permissions edit: {e!s}")
-            return HttpResponseBadRequest(
-                "Error performing bulk permissions edit, check logs for more detail.",
-            )
+                if "permissions" in serializer.validated_data:
+                    for obj in qs:
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=obj,
+                            merge=merge,
+                        )
+
+            except Exception as e:
+                logger.warning(
+                    f"An error occurred performing bulk permissions edit: {e!s}",
+                )
+                return HttpResponseBadRequest(
+                    "Error performing bulk permissions edit, check logs for more detail.",
+                )
+
+        elif operation == "delete":
+            objs.delete()
+
+        return Response({"result": "OK"})
 
 
 class WorkflowTriggerViewSet(ModelViewSet):

@@ -1,5 +1,79 @@
 # Changelog
 
+## paperless-ngx 2.5.4
+
+### Bug Fixes
+
+- Fix: handle title placeholder for docs without original_filename [@shamoon](https://github.com/shamoon) ([#5828](https://github.com/paperless-ngx/paperless-ngx/pull/5828))
+- Fix: bulk edit objects does not respect global permissions [@shamoon](https://github.com/shamoon) ([#5888](https://github.com/paperless-ngx/paperless-ngx/pull/5888))
+- Fix: intermittent save \& close warnings [@shamoon](https://github.com/shamoon) ([#5838](https://github.com/paperless-ngx/paperless-ngx/pull/5838))
+- Fix: inotify read timeout not in ms [@grembo](https://github.com/grembo) ([#5876](https://github.com/paperless-ngx/paperless-ngx/pull/5876))
+- Fix: allow relative date queries not in quick list [@shamoon](https://github.com/shamoon) ([#5801](https://github.com/paperless-ngx/paperless-ngx/pull/5801))
+- Fix: pass rule id to consumed .eml files [@shamoon](https://github.com/shamoon) ([#5800](https://github.com/paperless-ngx/paperless-ngx/pull/5800))
+
+### Dependencies
+
+- Chore(deps): Bump cryptography from 42.0.2 to 42.0.4 [@dependabot](https://github.com/dependabot) ([#5851](https://github.com/paperless-ngx/paperless-ngx/pull/5851))
+- Chore(deps-dev): Bump ip from 2.0.0 to 2.0.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#5835](https://github.com/paperless-ngx/paperless-ngx/pull/5835))
+- Chore(deps): Bump undici and [@<!---->angular-devkit/build-angular in /src-ui @dependabot](https://github.com/<!---->angular-devkit/build-angular in /src-ui @dependabot) ([#5796](https://github.com/paperless-ngx/paperless-ngx/pull/5796))
+
+### All App Changes
+
+<details>
+<summary>8 changes</summary>
+
+- Fix: handle title placeholder for docs without original_filename [@shamoon](https://github.com/shamoon) ([#5828](https://github.com/paperless-ngx/paperless-ngx/pull/5828))
+- Fix: bulk edit objects does not respect global permissions [@shamoon](https://github.com/shamoon) ([#5888](https://github.com/paperless-ngx/paperless-ngx/pull/5888))
+- Fix: intermittent save \& close warnings [@shamoon](https://github.com/shamoon) ([#5838](https://github.com/paperless-ngx/paperless-ngx/pull/5838))
+- Fix: inotify read timeout not in ms [@grembo](https://github.com/grembo) ([#5876](https://github.com/paperless-ngx/paperless-ngx/pull/5876))
+- Chore(deps-dev): Bump ip from 2.0.0 to 2.0.1 in /src-ui [@dependabot](https://github.com/dependabot) ([#5835](https://github.com/paperless-ngx/paperless-ngx/pull/5835))
+- Chore(deps): Bump undici and [@<!---->angular-devkit/build-angular in /src-ui @dependabot](https://github.com/<!---->angular-devkit/build-angular in /src-ui @dependabot) ([#5796](https://github.com/paperless-ngx/paperless-ngx/pull/5796))
+- Fix: allow relative date queries not in quick list [@shamoon](https://github.com/shamoon) ([#5801](https://github.com/paperless-ngx/paperless-ngx/pull/5801))
+- Fix: pass rule id to consumed .eml files [@shamoon](https://github.com/shamoon) ([#5800](https://github.com/paperless-ngx/paperless-ngx/pull/5800))
+</details>
+
+## paperless-ngx 2.5.3
+
+### Bug Fixes
+
+- Fix: dont allow allauth redirects to any host [@shamoon](https://github.com/shamoon) ([#5783](https://github.com/paperless-ngx/paperless-ngx/pull/5783))
+- Fix: Interaction when both splitting and ASN are enabled [@stumpylog](https://github.com/stumpylog) ([#5779](https://github.com/paperless-ngx/paperless-ngx/pull/5779))
+- Fix: moved ssl_mode parameter for mysql backend engine [@MaciejSzczurek](https://github.com/MaciejSzczurek) ([#5771](https://github.com/paperless-ngx/paperless-ngx/pull/5771))
+
+### All App Changes
+
+<details>
+<summary>3 changes</summary>
+
+- Fix: dont allow allauth redirects to any host [@shamoon](https://github.com/shamoon) ([#5783](https://github.com/paperless-ngx/paperless-ngx/pull/5783))
+- Fix: Interaction when both splitting and ASN are enabled [@stumpylog](https://github.com/stumpylog) ([#5779](https://github.com/paperless-ngx/paperless-ngx/pull/5779))
+- Fix: moved ssl_mode parameter for mysql backend engine [@MaciejSzczurek](https://github.com/MaciejSzczurek) ([#5771](https://github.com/paperless-ngx/paperless-ngx/pull/5771))
+</details>
+
+## paperless-ngx 2.5.2
+
+### Bug Fixes
+
+- Fix: Generated secret key may include single or double quotes [@schmidtnz](https://github.com/schmidtnz) ([#5767](https://github.com/paperless-ngx/paperless-ngx/pull/5767))
+- Fix: consumer status alerts container blocks elements [@shamoon](https://github.com/shamoon) ([#5762](https://github.com/paperless-ngx/paperless-ngx/pull/5762))
+- Fix: handle document notes user format api change [@shamoon](https://github.com/shamoon) ([#5751](https://github.com/paperless-ngx/paperless-ngx/pull/5751))
+- Fix: Assign ASN from barcode only after any splitting [@stumpylog](https://github.com/stumpylog) ([#5745](https://github.com/paperless-ngx/paperless-ngx/pull/5745))
+
+### Dependencies
+
+- Chore(deps): Bump the major-versions group with 1 update [@dependabot](https://github.com/dependabot) ([#5741](https://github.com/paperless-ngx/paperless-ngx/pull/5741))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+- Fix: consumer status alerts container blocks elements [@shamoon](https://github.com/shamoon) ([#5762](https://github.com/paperless-ngx/paperless-ngx/pull/5762))
+- Fix: handle document notes user format api change [@shamoon](https://github.com/shamoon) ([#5751](https://github.com/paperless-ngx/paperless-ngx/pull/5751))
+- Fix: Assign ASN from barcode only after any splitting [@stumpylog](https://github.com/stumpylog) ([#5745](https://github.com/paperless-ngx/paperless-ngx/pull/5745))
+- Chore(deps): Bump the major-versions group with 1 update [@dependabot](https://github.com/dependabot) ([#5741](https://github.com/paperless-ngx/paperless-ngx/pull/5741))
+</details>
+
 ## paperless-ngx 2.5.1
 
 ### Bug Fixes
